@@ -1,5 +1,5 @@
 # .github/workflows/cd.yml
-name: CD - Desplegar a Producción
+name: CD - Desplegar a Render
 
 on:
   push:
@@ -11,9 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger Render Deployment
-        uses: render-oss/render-deploy-action@v1
-        with:
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-          api-key: ${{ secrets.RENDER_API_KEY }}
-          wait-for-success: true # Esto hace que el workflow espere a que termine el despliegue
+      # Opcional pero recomendado: corre las pruebas antes de desplegar
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        run: npm test
+
+      # Este es el paso mágico que despliega en Render
+      - name: Trigger Render Deploy
+        env:
+          DEPLOY_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl -X POST "$DEPLOY_URL"
+          echo "✅ Despliegue iniciado! Revisa: https://dashboard.render.com"
