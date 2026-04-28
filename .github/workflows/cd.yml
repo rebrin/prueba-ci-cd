@@ -1,0 +1,22 @@
+# .github/workflows/cd.yml
+name: CD - Desplegar a Producción
+
+# Se ejecuta solo cuando hay un push exitoso a la rama main
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    name: Desplegar en Render
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Desencadenar despliegue en Render
+        # Usamos una acción creada por la comunidad para hablar con la API de Render
+        uses: johnbeynon/render-deploy-action@v1
+        with:
+          # Estos valores los toma de los "Secrets" que guardaste en GitHub
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
