@@ -1,0 +1,35 @@
+# .github/workflows/ci.yml
+name: CI - Tests Automáticos
+
+# El "on" define CUÁNDO se ejecutará este flujo de trabajo
+on:
+  push:
+    branches: ["main"] # Cada vez que hagas push a 'main'
+  pull_request:
+    branches: ["main"] # También en Pull Requests hacia 'main'
+
+# Un workflow se compone de uno o varios "jobs"
+jobs:
+  test:
+    name: Ejecutar pruebas
+    runs-on: ubuntu-latest # Usa una máquina virtual de Ubuntu gratuita de GitHub
+
+    # "steps" son las tareas individuales que se ejecutan dentro del job
+    steps:
+      # Paso 1: Descargar el código del repositorio
+      - uses: actions/checkout@v4
+
+      # Paso 2: Configurar Node.js con la versión que usamos
+      - name: Usar Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm" # Esto acelera las instalaciones futuras
+
+      # Paso 3: Instalar las dependencias
+      - name: Instalar dependencias
+        run: npm ci # 'ci' es más rápido y confiable para CI que 'install'
+
+      # Paso 4: ¡Ejecutar las pruebas!
+      - name: Correr pruebas
+        run: npm test
